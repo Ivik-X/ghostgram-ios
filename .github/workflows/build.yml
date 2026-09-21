@@ -49,20 +49,24 @@ jobs:
 
           python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
           python3 -u build-system/Make/Make.py \
+            --overrideXcodeVersion \
+            --overrideBazelVersion \
             --bazelUserRoot="$BAZEL_USER_ROOT" \
             build \
             --configurationPath="build-system/ghostgram-configuration.json" \
             --codesigningInformationPath=build-system/fake-codesigning \
             --configuration=release_arm64 \
-            --buildNumber="$BUILD_NUMBER"
+            --buildNumber="$BUILD_NUMBER" \
+            --outputBuildArtifactsPath="$SOURCE_DIR/build/artifacts"
 
-          OUTPUT_PATH="build/artifacts"
-          rm -rf "$OUTPUT_PATH"
+          OUTPUT_PATH="$SOURCE_DIR/build/artifacts"
           mkdir -p "$OUTPUT_PATH"
-          for f in bazel-out/applebin_ios-ios_arm*-opt-ST-*/bin/Telegram/*.ipa; do
-            if [ -f "$f" ]; then
-              cp "$f" "$OUTPUT_PATH/Ghostgram.ipa"
-            fi
+          if [ -f "$OUTPUT_PATH/Swiftgram.ipa" ]; then
+            cp "$OUTPUT_PATH/Swiftgram.ipa" "$OUTPUT_PATH/Ghostgram.ipa"
+          fi
+          for f in $(find bazel-bin bazel-out -name "*.ipa" 2>/dev/null); do
+            echo "Found IPA: $f"
+            cp "$f" "$OUTPUT_PATH/Ghostgram.ipa"
           done
 
       - name: Upload Ghostgram IPA Artifact

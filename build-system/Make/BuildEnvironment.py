@@ -128,7 +128,7 @@ def get_xcode_version():
 
     plist_path = '{}/../Info.plist'.format(xcode_path)
     if not os.path.isfile(plist_path):
-        return "26.2"
+        return "15.4"
 
     info_plist_lines = run_executable_with_output('plutil', [
         '-p', plist_path
@@ -141,7 +141,7 @@ def get_xcode_version():
             version = line[index + len(pattern):].strip('"')
             return version
 
-    return "26.2"
+    return "15.4"
 
 
 class BuildEnvironmentVersions:

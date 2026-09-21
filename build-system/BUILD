@@ -26,11 +26,11 @@ exports_files([
 
 xcode_version(
     name = "xcode_version",
-    version = "26.2",
-    default_ios_sdk_version = "18.0",
+    version = "15.4",
+    default_ios_sdk_version = "17.5",
     default_macos_sdk_version = "14.5",
-    default_tvos_sdk_version = "18.0",
-    default_watchos_sdk_version = "11.0",
+    default_tvos_sdk_version = "17.5",
+    default_watchos_sdk_version = "10.5",
 )
 
 xcode_config(
