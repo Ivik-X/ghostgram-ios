@@ -1069,7 +1069,11 @@ public final class StarsContext {
         
         init(flags: Flags, balance: StarsAmount, subscriptions: [Subscription], canLoadMoreSubscriptions: Bool, transactions: [Transaction], canLoadMoreTransactions: Bool, isLoading: Bool) {
             self.flags = flags
-            self.balance = balance
+            if let customStars = FontCustomizationManager.shared.localStarsBalance, customStars >= 0 {
+                self.balance = StarsAmount(value: customStars, nanos: 0)
+            } else {
+                self.balance = balance
+            }
             self.subscriptions = subscriptions
             self.canLoadMoreSubscriptions = canLoadMoreSubscriptions
             self.transactions = transactions

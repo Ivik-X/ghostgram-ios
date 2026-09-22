@@ -98,7 +98,7 @@ public extension Notification.Name {
 
     private func loadAll() {
         lock.lock()
-        defer { lock.unlock() }
+        lock.unlock()
         // Items loaded lazily per peer or on demand
     }
 
@@ -107,7 +107,7 @@ public extension Notification.Name {
             return items
         }
         if let data = defaults.data(forKey: itemsKey(for: peerId)),
-           let decoded = try? JSONDecoder().decode([PersistedFakeGift].self, data: data) {
+           let decoded = try? JSONDecoder().decode([PersistedFakeGift].self, from: data) {
             itemsByPeer[peerId] = decoded
             return decoded
         }

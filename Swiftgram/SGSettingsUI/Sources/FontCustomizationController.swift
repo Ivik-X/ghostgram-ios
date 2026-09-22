@@ -14,6 +14,7 @@ private enum FontCustomizationSection: Int32 {
     case appearance
     case chatList
     case behavior
+    case stars
 }
 
 private enum FontCustomizationEntry: ItemListNodeEntry {
@@ -35,6 +36,9 @@ private enum FontCustomizationEntry: ItemListNodeEntry {
     case behaviorHeader(PresentationTheme, String)
     case tripleTapDelete(PresentationTheme, String, String)
     case readStatusColor(PresentationTheme, String, String)
+    case starsHeader(PresentationTheme, String)
+    case localStarsInput(PresentationTheme, String, String)
+    case localStarsReset(PresentationTheme, String)
 
     var section: ItemListSectionId {
         switch self {
@@ -46,6 +50,8 @@ private enum FontCustomizationEntry: ItemListNodeEntry {
             return FontCustomizationSection.chatList.rawValue
         case .behaviorHeader, .tripleTapDelete, .readStatusColor:
             return FontCustomizationSection.behavior.rawValue
+        case .starsHeader, .localStarsInput, .localStarsReset:
+            return FontCustomizationSection.stars.rawValue
         }
     }
 
@@ -69,6 +75,9 @@ private enum FontCustomizationEntry: ItemListNodeEntry {
         case .behaviorHeader: return 200
         case .tripleTapDelete: return 201
         case .readStatusColor: return 202
+        case .starsHeader: return 300
+        case .localStarsInput: return 301
+        case .localStarsReset: return 302
         }
     }
 
@@ -147,6 +156,16 @@ private enum FontCustomizationEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(presentationData: presentationData, title: title, label: label, sectionId: self.section, style: .blocks, action: {
                 args.cycleReadStatusColor()
             })
+        case let .starsHeader(_, text):
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: text, multiline: false, sectionId: self.section)
+        case let .localStarsInput(_, title, label):
+            return ItemListDisclosureItem(presentationData: presentationData, title: title, label: label, sectionId: self.section, style: .blocks, action: {
+                args.editLocalStars()
+            })
+        case let .localStarsReset(_, title):
+            return ItemListActionItem(presentationData: presentationData, title: title, kind: .destructive, alignment: .natural, sectionId: self.section, style: .blocks, action: {
+                args.resetLocalStars()
+            })
         }
     }
 }
@@ -167,6 +186,9 @@ private final class FontCustomizationControllerArguments {
     let cycleTripleTapDelete: () -> Void
     let cycleReadStatusColor: () -> Void
 
+    let editLocalStars: () -> Void
+    let resetLocalStars: () -> Void
+
     init(
         toggleCustomFont: @escaping (Bool) -> Void,
         selectFont: @escaping (String) -> Void,
@@ -181,7 +203,9 @@ private final class FontCustomizationControllerArguments {
         toggleConnectionStatus: @escaping (Bool) -> Void,
         toggleUnifiedSearch: @escaping (Bool) -> Void,
         cycleTripleTapDelete: @escaping () -> Void,
-        cycleReadStatusColor: @escaping () -> Void
+        cycleReadStatusColor: @escaping () -> Void,
+        editLocalStars: @escaping () -> Void,
+        resetLocalStars: @escaping () -> Void
     ) {
         self.toggleCustomFont = toggleCustomFont
         self.selectFont = selectFont
@@ -197,10 +221,14 @@ private final class FontCustomizationControllerArguments {
         self.toggleUnifiedSearch = toggleUnifiedSearch
         self.cycleTripleTapDelete = cycleTripleTapDelete
         self.cycleReadStatusColor = cycleReadStatusColor
+        self.editLocalStars = editLocalStars
+        self.resetLocalStars = resetLocalStars
     }
 }
 
 public func fontCustomizationController(context: AccountContext) -> ViewController {
+    var presentControllerImpl: ((ViewController, ViewControllerPresentationArguments?) -> Void)?
+
     let arguments = FontCustomizationControllerArguments(
         toggleCustomFont: { v in FontCustomizationManager.shared.isEnabled = v },
         selectFont: { f in FontCustomizationManager.shared.selectedFont = f },
@@ -229,6 +257,44 @@ public func fontCustomizationController(context: AccountContext) -> ViewControll
             case .gray: FontCustomizationManager.shared.readStatusColorMode = .custom
             case .custom: FontCustomizationManager.shared.readStatusColorMode = .blue
             }
+        },
+        editLocalStars: {
+            let current = FontCustomizationManager.shared.localStarsBalance.map { "\($0)" } ?? ""
+            let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            let alertController = textAlertController(
+                context: context,
+                title: "Локальные звёзды",
+                text: "Введите желаемое отображаемое количество Telegram Stars:",
+                subheadings: [],
+                values: [
+                    TextAlertValue(
+                        value: current,
+                        placeholder: "Количество",
+                        identifier: "stars"
+                    )
+                ],
+                characterLimit: 12,
+                actions: [
+                    TextAlertAction(
+                        type: .genericAction,
+                        title: presentationData.strings.Common_Cancel,
+                        action: nil
+                    ),
+                    TextAlertAction(
+                        type: .defaultAction,
+                        title: presentationData.strings.Common_OK,
+                        action: { values in
+                            if let val = values?["stars"], let num = Int64(val) {
+                                FontCustomizationManager.shared.localStarsBalance = num
+                            }
+                        }
+                    )
+                ]
+            )
+            presentControllerImpl?(alertController, nil)
+        },
+        resetLocalStars: {
+            FontCustomizationManager.shared.localStarsBalance = nil
         }
     )
 
@@ -276,10 +342,21 @@ public func fontCustomizationController(context: AccountContext) -> ViewControll
             }
             entries.append(.readStatusColor(presentationData.theme, "Цвет галочек прочтения", statusLabel))
 
+            entries.append(.starsHeader(presentationData.theme, "ЛОКАЛЬНЫЕ ЗВЁЗДЫ"))
+            let starsValue = mgr.localStarsBalance.map { "\($0)" } ?? "Не задано"
+            entries.append(.localStarsInput(presentationData.theme, "Локальные звёзды", starsValue))
+            if mgr.localStarsBalance != nil {
+                entries.append(.localStarsReset(presentationData.theme, "Сбросить локальные звёзды"))
+            }
+
             let controllerState = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text("Кастомизация UI"), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
             let listState = ItemListNodeState(entries: entries, style: .blocks)
             return (controllerState, (listState, arguments))
         })
+
+    presentControllerImpl = { [weak controller] c, a in
+        controller?.present(c, in: .window(.root), with: a)
+    }
 
     return controller
 }

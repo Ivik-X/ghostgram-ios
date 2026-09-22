@@ -61,7 +61,7 @@ public extension Notification.Name {
             do {
                 if FileManager.default.fileExists(atPath: fileURL.path) {
                     let data = try Data(contentsOf: fileURL)
-                    self.bookmarks = try JSONDecoder().decode([MessageBookmark].self, data: data)
+                    self.bookmarks = try JSONDecoder().decode([MessageBookmark].self, from: data)
                 }
             } catch {
                 print("[MessageBookmarkManager] Failed to load: \(error)")

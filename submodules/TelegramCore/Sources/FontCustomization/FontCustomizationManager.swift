@@ -201,6 +201,205 @@ public extension Notification.Name {
         }
     }
 
+    public var localStarsBalance: Int64? {
+        get {
+            let val = defaults.object(forKey: "GG.fontCustomization.localStarsBalance")
+            if let num = val as? NSNumber {
+                return num.int64Value
+            } else if let str = val as? String, let num = Int64(str) {
+                return num
+            }
+            return nil
+        }
+        set {
+            if let newValue = newValue {
+                defaults.set(newValue, forKey: "GG.fontCustomization.localStarsBalance")
+            } else {
+                defaults.removeObject(forKey: "GG.fontCustomization.localStarsBalance")
+            }
+            notifyChanged()
+        }
+    }
+
+    public var hideStarRatingBadge: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.hideStarRatingBadge") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.hideStarRatingBadge")
+            notifyChanged()
+        }
+    }
+
+    public var showPeerInfoShareButton: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.showPeerInfoShareButton") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.showPeerInfoShareButton")
+            notifyChanged()
+        }
+    }
+
+    public var autoMuteNewChannels: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.autoMuteNewChannels") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.autoMuteNewChannels")
+            notifyChanged()
+        }
+    }
+
+    public var readStatusColorEnabled: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.readStatusColorEnabled") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.readStatusColorEnabled")
+            notifyChanged()
+        }
+    }
+
+    public var readStatusCustomColor: Int32 {
+        get { return Int32(defaults.integer(forKey: "GG.fontCustomization.readStatusCustomColor")) }
+        set {
+            defaults.set(Int(newValue), forKey: "GG.fontCustomization.readStatusCustomColor")
+            notifyChanged()
+        }
+    }
+
+    public var showChatListAccountSwitcher: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.showChatListAccountSwitcher") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.showChatListAccountSwitcher")
+            notifyChanged()
+        }
+    }
+
+    public var hideEditEmojiStatusAction: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.hideEditEmojiStatusAction") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.hideEditEmojiStatusAction")
+            notifyChanged()
+        }
+    }
+
+    public var settingsAccountsCollapsed: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.settingsAccountsCollapsed") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.settingsAccountsCollapsed")
+            notifyChanged()
+        }
+    }
+
+    public var hideEditProfileColorAction: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.hideEditProfileColorAction") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.hideEditProfileColorAction")
+            notifyChanged()
+        }
+    }
+
+    public var hideEditProfilePhotoAction: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.hideEditProfilePhotoAction") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.hideEditProfilePhotoAction")
+            notifyChanged()
+        }
+    }
+
+    public var hideChatListSearchBar: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.hideChatListSearchBar") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.hideChatListSearchBar")
+            notifyChanged()
+        }
+    }
+
+    public var hideProfileDescription: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.hideProfileDescription") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.hideProfileDescription")
+            notifyChanged()
+        }
+    }
+
+    public var androidChatList: Bool {
+        get { return defaults.bool(forKey: "GG.ggdroid.androidChatList") }
+        set {
+            defaults.set(newValue, forKey: "GG.ggdroid.androidChatList")
+            notifyChanged()
+        }
+    }
+
+    public var contextShowLocalEdit: Bool {
+        get { return defaults.bool(forKey: "GG.contextShowLocalEdit") }
+        set {
+            defaults.set(newValue, forKey: "GG.contextShowLocalEdit")
+            notifyChanged()
+        }
+    }
+
+    public var doubleTapToCopyIncoming: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.doubleTapToCopyIncoming") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.doubleTapToCopyIncoming")
+            notifyChanged()
+        }
+    }
+
+    public var snowflakesInChat: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.snowflakesInChat") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.snowflakesInChat")
+            notifyChanged()
+        }
+    }
+
+    public var snowflakesIntensity: Double {
+        get {
+            let val = defaults.double(forKey: "GG.fontCustomization.snowflakesIntensity")
+            return val == 0.0 ? 1.0 : val
+        }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.snowflakesIntensity")
+            notifyChanged()
+        }
+    }
+
+    public var chatListItemScale: Int32 {
+        get { return Int32(defaults.integer(forKey: "GG.fontCustomization.chatListItemScale")) }
+        set {
+            defaults.set(Int(newValue), forKey: "GG.fontCustomization.chatListItemScale")
+            notifyChanged()
+        }
+    }
+
+    public var hideStoryCirclesInChatList: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.hideStoryCirclesInChatList") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.hideStoryCirclesInChatList")
+            notifyChanged()
+        }
+    }
+
+    public var storyCircleColor: Int32 {
+        get { return Int32(defaults.integer(forKey: "GG.fontCustomization.storyCircleColor")) }
+        set {
+            defaults.set(Int(newValue), forKey: "GG.fontCustomization.storyCircleColor")
+            notifyChanged()
+        }
+    }
+
+    public var searchBarColorEnabled: Bool {
+        get { return defaults.bool(forKey: "GG.fontCustomization.searchBarColorEnabled") }
+        set {
+            defaults.set(newValue, forKey: "GG.fontCustomization.searchBarColorEnabled")
+            notifyChanged()
+        }
+    }
+
+    public var searchBarColor: Int32 {
+        get { return Int32(defaults.integer(forKey: "GG.fontCustomization.searchBarColor")) }
+        set {
+            defaults.set(Int(newValue), forKey: "GG.fontCustomization.searchBarColor")
+            notifyChanged()
+        }
+    }
+
     public var tripleTapDeleteMode: TripleTapDeleteMode {
         get {
             guard let raw = defaults.string(forKey: "FontCustomization.tripleTapDeleteMode"),

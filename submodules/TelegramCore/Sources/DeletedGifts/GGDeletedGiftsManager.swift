@@ -68,7 +68,7 @@ public extension Notification.Name {
     private func load() {
         if let data = UserDefaults.standard.data(forKey: storageKey) {
             do {
-                let catalog = try JSONDecoder().decode(GGDeletedGiftsCatalog.self, data: data)
+                let catalog = try JSONDecoder().decode(GGDeletedGiftsCatalog.self, from: data)
                 self.cachedGifts = catalog.gifts
             } catch {
                 self.cachedGifts = []
