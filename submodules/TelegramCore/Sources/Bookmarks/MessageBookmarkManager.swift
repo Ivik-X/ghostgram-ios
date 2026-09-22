@@ -59,8 +59,8 @@ public extension Notification.Name {
     private func load() {
         queue.sync {
             do {
-                if FileManager.default.fileExists(atPath: fileURL.path) {
-                    let data = try Data(contentsOf: fileURL)
+                if FileManager.default.fileExists(atPath: self.fileURL.path) {
+                    let data = try Data(contentsOf: self.fileURL)
                     self.bookmarks = try JSONDecoder().decode([MessageBookmark].self, from: data)
                 }
             } catch {

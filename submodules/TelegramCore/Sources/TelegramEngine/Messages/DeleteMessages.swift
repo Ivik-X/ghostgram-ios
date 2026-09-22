@@ -63,7 +63,11 @@ public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBo
                     updatedAttributes.append(DeletedMessageAttribute(deletedAt: now, timestamp: message.timestamp, originalAuthor: message.author?.id))
                 }
                 transaction.updateMessage(id, update: { current in
-                    return .update(current.withUpdatedAttributes(updatedAttributes))
+                    var storeForwardInfo: StoreMessageForwardInfo?
+                    if let forwardInfo = current.forwardInfo {
+                        storeForwardInfo = StoreMessageForwardInfo(authorId: forwardInfo.author?.id, sourceId: forwardInfo.source?.id, sourceMessageId: forwardInfo.sourceMessageId, date: forwardInfo.date, authorSignature: forwardInfo.authorSignature, psaType: forwardInfo.psaType, flags: forwardInfo.flags)
+                    }
+                    return .update(StoreMessage(id: current.id, customStableId: nil, globallyUniqueId: current.globallyUniqueId, groupingKey: current.groupingKey, threadId: current.threadId, timestamp: current.timestamp, flags: StoreMessageFlags(current.flags), tags: current.tags, globalTags: current.globalTags, localTags: current.localTags, forwardInfo: storeForwardInfo, authorId: current.author?.id, text: current.text, attributes: updatedAttributes, media: current.media))
                 })
                 continue
             }

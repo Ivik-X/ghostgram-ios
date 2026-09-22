@@ -136,18 +136,25 @@ public extension Notification.Name {
         return loadGifts(for: peerId.toInt64()).count
     }
 
+    private func giftId(from reference: StarGiftReference) -> Int64? {
+        switch reference {
+        case let .peer(_, id):
+            return id
+        case let .slug(slug):
+            return Int64(slug)
+        case let .message(msgId):
+            return Int64(msgId.id)
+        }
+    }
+
     public func isFakeReference(_ reference: StarGiftReference, for peerId: PeerId) -> Bool {
         guard isEnabled else { return false }
         lock.lock()
         defer { lock.unlock() }
         let rawPeerId = peerId.toInt64()
         let list = loadGifts(for: rawPeerId)
-        switch reference {
-        case let .generic(id):
-            return list.contains(where: { $0.id == id })
-        case let .unique(slug):
-            return list.contains(where: { String($0.id) == slug })
-        }
+        guard let targetId = giftId(from: reference) else { return false }
+        return list.contains(where: { $0.id == targetId })
     }
 
     public func updateGift(
@@ -157,17 +164,11 @@ public extension Notification.Name {
         date: Int32,
         text: String?
     ) {
+        guard let targetId = giftId(from: reference) else { return }
         lock.lock()
         defer { lock.unlock() }
         let rawPeerId = peerId.toInt64()
         var list = loadGifts(for: rawPeerId)
-        let targetId: Int64
-        switch reference {
-        case let .generic(id):
-            targetId = id
-        case let .unique(slug):
-            targetId = Int64(slug) ?? 0
-        }
 
         if let index = list.firstIndex(where: { $0.id == targetId }) {
             list[index].fromPeerId = fromPeerId?.toInt64()
@@ -178,15 +179,11 @@ public extension Notification.Name {
     }
 
     public func setPinnedToTop(reference: StarGiftReference, for peerId: PeerId, pinned: Bool) {
+        guard let targetId = giftId(from: reference) else { return }
         lock.lock()
         defer { lock.unlock() }
         let rawPeerId = peerId.toInt64()
         var list = loadGifts(for: rawPeerId)
-        let targetId: Int64
-        switch reference {
-        case let .generic(id): targetId = id
-        case let .unique(slug): targetId = Int64(slug) ?? 0
-        }
         if let index = list.firstIndex(where: { $0.id == targetId }) {
             list[index].pinnedToTop = pinned
             saveGifts(for: rawPeerId, gifts: list)
@@ -194,15 +191,11 @@ public extension Notification.Name {
     }
 
     public func setSavedToProfile(reference: StarGiftReference, for peerId: PeerId, added: Bool) {
+        guard let targetId = giftId(from: reference) else { return }
         lock.lock()
         defer { lock.unlock() }
         let rawPeerId = peerId.toInt64()
         var list = loadGifts(for: rawPeerId)
-        let targetId: Int64
-        switch reference {
-        case let .generic(id): targetId = id
-        case let .unique(slug): targetId = Int64(slug) ?? 0
-        }
         if let index = list.firstIndex(where: { $0.id == targetId }) {
             list[index].savedToProfile = added
             saveGifts(for: rawPeerId, gifts: list)
